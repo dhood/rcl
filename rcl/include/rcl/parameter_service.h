@@ -1,0 +1,161 @@
+// Copyright 2016 Open Source Robotics Foundation, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef RCL__PARAMETER_SERVICE_H_
+#define RCL__PARAMETER_SERVICE_H_
+
+#if __cplusplus
+extern "C"
+{
+#endif
+
+#include <rcl_interfaces/srv/get_parameters.h>
+#include <rcl_interfaces/srv/list_parameters.h>
+#include <rcl_interfaces/srv/set_parameters.h>
+
+#include "rcl/node.h"
+#include "rcl/service.h"
+
+typedef struct rcl_parameter_service_t
+{
+  rcl_node_t * node;
+  rcl_service_t * get_parameters_service;
+  rcl_service_t * get_parameter_types_service;
+  rcl_service_t * set_parameters_service;
+  rcl_service_t * set_parameters_atomically_service;
+  rcl_service_t * list_parameters_service;
+} rcl_parameter_service_t;
+
+typedef struct rcl_parameter_service_options_t
+{
+  // quality of service settings for all services
+  rmw_qos_profile_t qos;
+  rcl_allocator_t allocator;
+} rcl_parameter_service_options_t;
+
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_parameter_service_t
+rcl_get_zero_initialized_parameter_service(void);
+
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_init(
+  rcl_parameter_service_t * parameter_service,
+  const rcl_node_t * node,
+  const rcl_service_options_t * options
+);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_fini(rcl_parameter_service_t * parameter_service);
+
+/*
+ message/request/response conversion functions:
+rcl_events_from_get_parameters_response
+
+rcl_events_from_get_parameter_types_response
+
+rcl_events_from_set_parameters_response
+
+rcl_events_from_set_parameters_atomically_response
+
+rcl_events_from_list_parameters_atomically_response
+*/
+
+/*
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_take_get_parameters_request(
+  const rcl_parameter_service_t * service,
+  rosidl_generator_c__String__Array * parameter_names);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_send_get_parameters_response(
+  const rcl_parameter_service_t * service,
+  const rcl_interfaces__msg__ParameterValue__Array * parameter_values);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_take_get_parameter_types_request(
+  const rcl_parameter_service_t * service,
+  rosidl_generator_c__String__Array * parameter_names);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_send_get_parameter_types_response(
+  const rcl_parameter_service_t * service,
+  const rosidl_generator_c__uint8__Array * parameter_types);
+
+// Function arguments pass messages defined in rcl_interfaces directly
+// Wraps rcl_interfaces/Parameter array into Request
+// wrap service send_request call
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_take_set_parameters_request(
+  const rcl_parameter_service_t * service,
+  rcl_interfaces__msg__Parameter__Array * parameter_values);
+
+// take response of set_parameters call
+// converts srv to results structure
+RCL_PUBLIC RCL_WARN_UNUSED rcl_ret_t
+rcl_send_set_parameters_response(
+  const rcl_parameter_service_t * service,
+  const rcl_interfaces__msg__SetParametersResult * set_parameters_result);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_take_set_parameters_atomically_request(
+  const rcl_parameter_service_t * service,
+  rcl_interfaces__msg__Parameter__Array * parameter_values);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_send_set_parameters_atomically_response(
+  const rcl_parameter_service_t * service,
+  const rcl_interfaces__msg__SetParametersResult * set_parameters_result);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_take_list_parameters_request(
+  const rcl_parameter_service_t * service,
+  rosidl_generator_c__String__Array * prefixes,
+  uint64_t * depth);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_send_list_parameters_response(
+  const rcl_parameter_service_t * service,
+  const rcl_interfaces__msg__ListParametersResult * set_parameters_result);
+*/
+
+#if __cplusplus
+}
+#endif
+
+#endif  // RCL__PARAMETER_SERVICE_H_
