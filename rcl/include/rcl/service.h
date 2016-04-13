@@ -45,6 +45,22 @@ typedef struct rcl_service_options_t
   rcl_allocator_t allocator;
 } rcl_service_options_t;
 
+/// Wait until a service server is available.
+/* Given a service name, this function will block until the service is
+ * available or until the given timeout has elapsed.
+ *
+ * \param[in] service_name the name of the service on which to wait
+ * \param[in] timeout the duration to wait for the service to be ready, in nanoseconds
+ * \return RCL_RET_OK the service was already ready, or became ready, or
+ *         RCL_RET_INVALID_ARGUMENT if any arguments are invalid, or
+ *         RCL_RET_TIMEOUT if the timeout expired before something was ready, or
+ *         RCL_RET_ERROR an unspecified error occur.
+ */
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_wait_for_service(const char * service_name, int64_t timeout);
+
 /// Return a rcl_service_t struct with members set to NULL.
 /* Should be called to get a null rcl_service_t before passing to
  * rcl_initalize_service().
