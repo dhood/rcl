@@ -95,11 +95,29 @@ TEST_P(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_parameters_nom
 {
   stop_memory_checking();
 
-  start_memory_checking();
-  // 
+  rcl_wait_set_t wait_set = get_zero_initialized_wait_set();
+  rcl_wait_set_init(&wait_set, 0, 0, 0, 0, 0, rcl_get_default_allocator());
 
+  // These implicitly add the parameter clients, services and subscriptions to the waitset
+  rcl_wait_set_add_parameter_client(&wait_set, this->parameter_client);
+  rcl_wait_set_add_parameter_service(&wait_set, this->parameter_service);
+
+  // how to show parameter events?
+
+  start_memory_checking();
+
+  // Set parameters
+
+  // This will send a request for 
   rcl_parameter_client_send_set_parameters_request();
 
-  // wait until the parameters were set
+  // wait until the parameters were set, may have to set up waiting/taking for parameter services
+  rcl_wait(&wait_set, -1);
+  // Maybe take
+  // rcl_parameter_service_take_set_parameters_request();
+  rcl_parameters_take_set_parameters_response();
 
+  // Check
+
+  rcl_wait_set_fini(&wait_set);
 }
