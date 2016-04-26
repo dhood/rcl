@@ -20,14 +20,6 @@ extern "C"
 {
 #endif
 
-#include <rcl_interfaces/srv/get_parameters.h>
-#include <rcl_interfaces/srv/list_parameters.h>
-#include <rcl_interfaces/srv/set_parameters.h>
-
-#include "rcl/client.h"
-#include "rcl/node.h"
-#include "rcl/subscription.h"
-
 /// TODO:
 /*
 - Provide helper functions for topic names from node name
@@ -38,20 +30,16 @@ extern "C"
 - parameter_event msg can get populated with the response of a parameter_service
 */
 
+/// Internal rcl implementation struct
+struct rcl_parameter_client_impl_t;
+
 /// There is no sync/async parameter client distinction in rcl.
 typedef struct rcl_parameter_client_t
 {
-  // these should go in the impl struct
-  rcl_node_t * node;
-  rcl_client_t * get_parameters_client;
-  rcl_client_t * get_parameter_types_client;
-  rcl_client_t * set_parameters_client;
-  rcl_client_t * set_parameters_atomically_client;
-  rcl_client_t * list_parameters_client;
   // the parameter client provides storage and utility functions for parameter event subscription
   // Should instead have a create_parameter_event_subscription function for this parameter client?
   // rcl_subscription_t * parameter_event_subscription;
-
+  rcl_parameter_client_impl_t * impl;
 } rcl_parameter_client_t;
 
 typedef struct rcl_parameter_client_options_t
@@ -61,6 +49,11 @@ typedef struct rcl_parameter_client_options_t
   rcl_allocator_t allocator;
 } rcl_parameter_client_options_t;
 
+// TODO Make sure default options are correct (rmw parameters profile?)
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_service_options_t
+rcl_parameter_client_get_default_options(void);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED

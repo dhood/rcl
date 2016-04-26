@@ -20,21 +20,11 @@ extern "C"
 {
 #endif
 
-#include <rcl_interfaces/srv/get_parameters.h>
-#include <rcl_interfaces/srv/list_parameters.h>
-#include <rcl_interfaces/srv/set_parameters.h>
-
-#include "rcl/node.h"
-#include "rcl/service.h"
+struct rcl_parameter_service_impl_t;
 
 typedef struct rcl_parameter_service_t
 {
-  rcl_node_t * node;
-  rcl_service_t * get_parameters_service;
-  rcl_service_t * get_parameter_types_service;
-  rcl_service_t * set_parameters_service;
-  rcl_service_t * set_parameters_atomically_service;
-  rcl_service_t * list_parameters_service;
+  rcl_parameter_service_impl_t * impl;
 } rcl_parameter_service_t;
 
 typedef struct rcl_parameter_service_options_t
@@ -44,6 +34,10 @@ typedef struct rcl_parameter_service_options_t
   rcl_allocator_t allocator;
 } rcl_parameter_service_options_t;
 
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_service_options_t
+rcl_parameter_service_get_default_options(void);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
