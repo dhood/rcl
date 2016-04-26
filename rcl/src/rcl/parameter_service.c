@@ -30,7 +30,7 @@ typedef struct rcl_parameter_service_impl_t
   rcl_service_t * get_parameters_service;
   rcl_service_t * get_parameter_types_service;
   rcl_service_t * set_parameters_service;
-  // rcl_service_t * set_parameters_atomically_service;
+  rcl_service_t * set_parameters_atomically_service;
   rcl_service_t * list_parameters_service;
 } rcl_parameter_service_impl_t;
 

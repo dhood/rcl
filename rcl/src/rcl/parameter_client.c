@@ -35,7 +35,7 @@ typedef struct rcl_parameter_client_impl_t
   rcl_client_t * get_parameters_client;
   rcl_client_t * get_parameter_types_client;  // Also referred to as describe parameters in docs
   rcl_client_t * set_parameters_client;
-  // rcl_client_t * set_parameters_atomically_client;
+  rcl_client_t * set_parameters_atomically_client;
   rcl_client_t * list_parameters_client;
   // Storage for an optional parameter event subscriber
   rcl_subscription_t * parameter_event_subscription;

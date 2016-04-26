@@ -103,17 +103,29 @@ TEST_P(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_parameters_nom
   rcl_wait_set_add_parameter_service(&wait_set, this->parameter_service);
 
   // how to show parameter events?
+  // parameters:
+  // bool_param = true
+  // int_param = 123
+  // float_param = 45.67
+  // string_param = "hello world"
+  // bytes_param = '\1\2\3\4'
 
   start_memory_checking();
 
+  // parameter_client could provide convenience functions
+  rcl_interfaces__srv__SetParameters_Request set_param_req;
+  rcl_interfaces__srv__SetParameters_Request__init(&set_param_req);
+  rcl_interfaces__srv__Set(set_param_req.parameters);
+
   // Set parameters
+  //rcl_parameter_client_();
 
   // This will send a request for 
   rcl_parameter_client_send_set_parameters_request();
 
   // wait until the parameters were set, may have to set up waiting/taking for parameter services
   rcl_wait(&wait_set, -1);
-  // Maybe take
+  // Service take/send?
   // rcl_parameter_service_take_set_parameters_request();
   rcl_parameters_take_set_parameters_response();
 
