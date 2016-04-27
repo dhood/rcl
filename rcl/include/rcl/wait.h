@@ -26,6 +26,8 @@ extern "C"
 #include "rcl/client.h"
 #include "rcl/guard_condition.h"
 #include "rcl/macros.h"
+#include "rcl/parameter_client.h"
+#include "rcl/parameter_service.h"
 #include "rcl/service.h"
 #include "rcl/subscription.h"
 #include "rcl/timer.h"
@@ -438,6 +440,23 @@ RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
 rcl_wait_set_resize_services(rcl_wait_set_t * wait_set, size_t size);
+
+
+// TODO: Document
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_wait_set_add_parameter_service(
+  rcl_wait_set_t * wait_set,
+  const rcl_parameter_service_t * parameter_service);
+
+// TODO: Document
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_wait_set_add_parameter_client(
+  rcl_wait_set_t * wait_set,
+  const rcl_parameter_client_t * parameter_client);
 
 /// Block until the wait set is ready or until the timeout has been exceeded.
 /* This function will collect the items in the rcl_wait_set_t and pass them

@@ -20,11 +20,17 @@ extern "C"
 {
 #endif
 
+#include <rcl_interfaces/msg/parameter__struct.h>
+#include <rcl_interfaces/msg/set_parameters_result__struct.h>
+
+#include "rcl/node.h"
+#include "rcl/service.h"
+
 struct rcl_parameter_service_impl_t;
 
 typedef struct rcl_parameter_service_t
 {
-  rcl_parameter_service_impl_t * impl;
+  struct rcl_parameter_service_impl_t * impl;
 } rcl_parameter_service_t;
 
 typedef struct rcl_parameter_service_options_t
@@ -36,7 +42,7 @@ typedef struct rcl_parameter_service_options_t
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
-rcl_service_options_t
+rcl_parameter_service_options_t
 rcl_parameter_service_get_default_options(void);
 
 RCL_PUBLIC
@@ -51,7 +57,7 @@ rcl_ret_t
 rcl_parameter_service_init(
   rcl_parameter_service_t * parameter_service,
   const rcl_node_t * node,
-  const rcl_service_options_t * options
+  const rcl_parameter_service_options_t * options
 );
 
 RCL_PUBLIC
@@ -59,8 +65,23 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_service_fini(rcl_parameter_service_t * parameter_service);
 
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_take_set_request(
+  const rcl_parameter_service_t * service,
+  rcl_interfaces__msg__Parameter__Array * parameters);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_send_set_response(
+  const rcl_parameter_service_t * service,
+  const rcl_interfaces__msg__SetParametersResult__Array * set_parameter_results);
+
 /*
- message/request/response conversion functions:
+message/request/response conversion functions:
+
 rcl_events_from_get_parameters_response
 
 rcl_events_from_get_parameter_types_response
@@ -83,13 +104,6 @@ rcl_take_get_parameters_request(
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_send_get_parameters_response(
-  const rcl_parameter_service_t * service,
-  const rcl_interfaces__msg__ParameterValue__Array * parameter_values);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
 rcl_take_get_parameter_types_request(
   const rcl_parameter_service_t * service,
   rosidl_generator_c__String__Array * parameter_names);
@@ -104,12 +118,6 @@ rcl_send_get_parameter_types_response(
 // Function arguments pass messages defined in rcl_interfaces directly
 // Wraps rcl_interfaces/Parameter array into Request
 // wrap service send_request call
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_take_set_parameters_request(
-  const rcl_parameter_service_t * service,
-  rcl_interfaces__msg__Parameter__Array * parameter_values);
 
 // take response of set_parameters call
 // converts srv to results structure

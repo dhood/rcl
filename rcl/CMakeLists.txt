@@ -22,6 +22,8 @@ set(${PROJECT_NAME}_sources
   src/rcl/common.c
   src/rcl/guard_condition.c
   src/rcl/node.c
+  src/rcl/parameter_client.c
+  src/rcl/parameter_service.c
   src/rcl/publisher.c
   src/rcl/rcl.c
   src/rcl/service.c

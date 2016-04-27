@@ -20,6 +20,12 @@ extern "C"
 {
 #endif
 
+#include <rcl_interfaces/msg/parameter__struct.h>
+#include <rcl_interfaces/msg/set_parameters_result__struct.h>
+
+#include "rcl/client.h"
+#include "rcl/node.h"
+
 /// TODO:
 /*
 - Provide helper functions for topic names from node name
@@ -39,7 +45,7 @@ typedef struct rcl_parameter_client_t
   // the parameter client provides storage and utility functions for parameter event subscription
   // Should instead have a create_parameter_event_subscription function for this parameter client?
   // rcl_subscription_t * parameter_event_subscription;
-  rcl_parameter_client_impl_t * impl;
+  struct rcl_parameter_client_impl_t * impl;
 } rcl_parameter_client_t;
 
 typedef struct rcl_parameter_client_options_t
@@ -52,7 +58,7 @@ typedef struct rcl_parameter_client_options_t
 // TODO Make sure default options are correct (rmw parameters profile?)
 RCL_PUBLIC
 RCL_WARN_UNUSED
-rcl_service_options_t
+rcl_parameter_client_options_t
 rcl_parameter_client_get_default_options(void);
 
 RCL_PUBLIC
@@ -68,13 +74,93 @@ rcl_ret_t
 rcl_parameter_client_init(
   rcl_parameter_client_t * parameter_client,
   const rcl_node_t * node,
-  const rcl_client_options_t * options
+  const rcl_parameter_client_options_t * options
 );
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_fini(rcl_parameter_client_t * parameter_client);
+
+/// rcl_parameter_client_set_<TYPE> adds the parameter key, value pair to the
+/// pending set_parameters_request
+// CTYPE is a macro to sanitize human-readble type names to valid c types
+#define RCL_DEFINE_SET_PARAMETER_REQUEST(TYPE) \
+RCL_PUBLIC \
+RCL_WARN_UNUSED \
+rcl_ret_t \
+rcl_parameter_set_ ## TYPE ## ( \
+  rcl_interfaces__msg__Parameter * parameter, const char * name, CTYPE(TYPE) value, size_t * i); \
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_set_bool(
+  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, bool value);
+
+// Or, with the above macro, it would simply be RCL_DEFINE_SET_PARAMETER_REQUEST(bool)
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_set_int(
+  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, int value);
+
+// can't distinguish between floats and doubles. should use doubles underneath for more precision.
+// But should we still call them floats?
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_set_float(
+  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, double value);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_set_string(
+  rcl_interfaces__msg__Parameter * parameter,
+  const char * parameter_name,
+  const char * value);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_set_bytes(
+  rcl_interfaces__msg__Parameter * parameter,
+  const char * parameter_name,
+  const char * value);
+
+// etc. for all types
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_client_send_set_request(
+  rcl_parameter_client_t * parameter_client, rcl_interfaces__msg__Parameter__Array * parameters);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_client_take_set_response(rcl_parameter_client_t * parameter_client,
+  rcl_interfaces__msg__SetParametersResult__Array * set_parameters_result);
+
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_client_get_parameter(rcl_parameter_client_t * parameter_client, const char * parameter_name);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_client_get_parameters(rcl_parameter_client_t * parameter_client, const char ** parameter_names);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_client_take_get_response(rcl_parameter_client_t * parameter_client,
+  rcl_interfaces__msg__ParameterValue__Array * set_parameters_result);
+
 
 // I'm really not sure how useful any of the following stuff is
 

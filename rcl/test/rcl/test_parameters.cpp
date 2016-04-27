@@ -14,6 +14,10 @@
 
 #include <gtest/gtest.h>
 
+#include "rosidl_generator_c/string_functions.h"
+#include "rcl_interfaces/msg/parameter__functions.h"
+#include "rcl_interfaces/msg/set_parameters_result__functions.h"
+
 #include "rcl/error_handling.h"
 #include "rcl/node.h"
 #include "rcl/parameter_service.h"
@@ -36,6 +40,7 @@ class CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION) : public ::testing::T
 {
 public:
   rcl_node_t * node_ptr;
+  rcl_wait_set_t * wait_set;
   rcl_parameter_service_t * parameter_service;
   rcl_parameter_client_t * parameter_client;
 
@@ -51,15 +56,23 @@ public:
     rcl_node_options_t node_options = rcl_node_get_default_options();
     ret = rcl_node_init(this->node_ptr, name, &node_options);
 
+    ret = rcl_wait_set_init(this->wait_set, 0, 0, 0, 0, 0, rcl_get_default_allocator());
+
     this->parameter_service = new rcl_parameter_service_t;
     *this->parameter_service = rcl_get_zero_initialized_parameter_service();
     rcl_parameter_service_options_t ps_options = rcl_parameter_service_get_default_options();
-    ret = rcl_parameter_service_init(this->parameter_service, this->node_ptr, &ps_options)
+    ret = rcl_parameter_service_init(this->parameter_service, this->node_ptr, &ps_options);
 
     this->parameter_client = new rcl_parameter_client_t;
     *this->parameter_client = rcl_get_zero_initialized_parameter_client();
-    rcl_parameter_client_options_t ps_options = rcl_parameter_client_get_default_options();
-    ret = rcl_parameter_client_init(this->parameter_client, this->node_ptr, &ps_options);;
+    rcl_parameter_client_options_t cs_options = rcl_parameter_client_get_default_options();
+    ret = rcl_parameter_client_init(this->parameter_client, this->node_ptr, &cs_options);
+
+    // These implicitly add the parameter clients, services and subscriptions to the waitset
+    // Can we share the impl struct of parameter_client and parameter_service to only wait.c
+    // (kind of like a friend class in c++)?
+    ret = rcl_wait_set_add_parameter_client(wait_set, this->parameter_client);
+    ret = rcl_wait_set_add_parameter_service(wait_set, this->parameter_service);
 
     ASSERT_EQ(RCL_RET_OK, ret) << rcl_get_error_string_safe();
     set_on_unexpected_malloc_callback([]() {ASSERT_FALSE(true) << "UNEXPECTED MALLOC";});
@@ -80,10 +93,14 @@ public:
     rcl_ret_t ret = rcl_node_fini(this->node_ptr);
     delete this->node_ptr;
 
-    rcl_ret_t ret = rcl_parameter_service_fini(this->parameter_service);
+
+    rcl_wait_set_fini(this->wait_set);
+    delete this->wait_set;
+
+    ret = rcl_parameter_service_fini(this->parameter_service);
     delete this->parameter_service;
 
-    rcl_ret_t ret = rcl_parameter_client_fini(this->parameter_client);
+    ret = rcl_parameter_client_fini(this->parameter_client);
     delete this->parameter_client;
     EXPECT_EQ(RCL_RET_OK, ret) << rcl_get_error_string_safe();
     ret = rcl_shutdown();
@@ -91,45 +108,52 @@ public:
   }
 };
 
-TEST_P(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_parameters_nominal)
+TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters)
 {
   stop_memory_checking();
 
-  rcl_wait_set_t wait_set = get_zero_initialized_wait_set();
-  rcl_wait_set_init(&wait_set, 0, 0, 0, 0, 0, rcl_get_default_allocator());
+  rcl_ret_t ret;
 
-  // These implicitly add the parameter clients, services and subscriptions to the waitset
-  rcl_wait_set_add_parameter_client(&wait_set, this->parameter_client);
-  rcl_wait_set_add_parameter_service(&wait_set, this->parameter_service);
-
-  // how to show parameter events?
-  // parameters:
-  // bool_param = true
-  // int_param = 123
-  // float_param = 45.67
-  // string_param = "hello world"
-  // bytes_param = '\1\2\3\4'
+  // TODO parameter events?
 
   start_memory_checking();
+  const size_t num_params = 5;
 
-  // parameter_client could provide convenience functions
-  rcl_interfaces__srv__SetParameters_Request set_param_req;
-  rcl_interfaces__srv__SetParameters_Request__init(&set_param_req);
-  rcl_interfaces__srv__Set(set_param_req.parameters);
+  rcl_interfaces__msg__Parameter__Array parameters;
+  rcl_interfaces__msg__Parameter__Array__init(&parameters, num_params);
+  size_t parameters_idx = 0;
+  ret = rcl_parameter_set_bool(&parameters.data[parameters_idx++], "bool_param", true);
+  ret = rcl_parameter_set_int(&parameters.data[parameters_idx++], "int_param", 123);
+  ret = rcl_parameter_set_float(&parameters.data[parameters_idx++], "float_param", 45.67);
 
-  // Set parameters
-  //rcl_parameter_client_();
+  ret = rcl_parameter_set_string(&parameters.data[parameters_idx++], "string_param", "hello world");
+  ret = rcl_parameter_set_bytes(&parameters.data[parameters_idx++], "bytes_param", "\1\2\3\4");
 
-  // This will send a request for 
-  rcl_parameter_client_send_set_parameters_request();
+  ret = rcl_parameter_client_send_set_request(this->parameter_client, &parameters);
 
   // wait until the parameters were set, may have to set up waiting/taking for parameter services
-  rcl_wait(&wait_set, -1);
-  // Service take/send?
-  // rcl_parameter_service_take_set_parameters_request();
-  rcl_parameters_take_set_parameters_response();
+  ret = rcl_wait(this->wait_set, -1);
+  rcl_interfaces__msg__Parameter__Array * parameters_req = nullptr;
+  ret = rcl_parameter_service_take_set_request(this->parameter_service, parameters_req);
+  // In a real client library, need to access the request, fill in the response based on
+  // node's storage, debugging tools that set the reason, etc.
+  // TODO validate that parameters_req matches parameters
 
-  // Check
+  // For now we'll just set them all to be successful
+  rcl_interfaces__msg__SetParametersResult__Array results;
+  rcl_interfaces__msg__SetParametersResult__Array__init(&results, num_params);
 
-  rcl_wait_set_fini(&wait_set);
+  // Maybe helper functions can help associate the index?
+  for (size_t i = 0; i < num_params; ++i) {
+    results.data[i].successful = true;
+    rosidl_generator_c__String__assign(&results.data[i].reason, "Because reasons");
+  }
+  ret = rcl_parameter_service_send_set_response(this->parameter_service, &results);
+
+  ret = rcl_wait(this->wait_set, -1);
+  // Service take
+  rcl_interfaces__msg__SetParametersResult__Array * results_response = nullptr;
+  ret = rcl_parameter_client_take_set_response(this->parameter_client, results_response);
+  // TODO validate results and results_response
 }
+

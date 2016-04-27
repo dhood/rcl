@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RCL__PARAMETER_CLIENT_H_
-#define RCL__PARAMETER_CLIENT_H_
-
 #if __cplusplus
 extern "C"
 {
@@ -23,9 +20,11 @@ extern "C"
 #include <rcl_interfaces/srv/get_parameters.h>
 #include <rcl_interfaces/srv/list_parameters.h>
 #include <rcl_interfaces/srv/set_parameters.h>
+#include <rcl_interfaces/srv/set_parameters_atomically.h>
 
-#include "rcl/client.h"
-#include "rcl/node.h"
+#include <rcl_interfaces/msg/parameter_type__functions.h>
+
+#include "rcl/parameter_client.h"
 #include "rcl/subscription.h"
 
 
@@ -37,13 +36,36 @@ typedef struct rcl_parameter_client_impl_t
   rcl_client_t * set_parameters_client;
   rcl_client_t * set_parameters_atomically_client;
   rcl_client_t * list_parameters_client;
-  // Storage for an optional parameter event subscriber
+
+  // Store the upcoming request/pending responses for each client
+  rcl_interfaces__srv__GetParameters_Request get_parameters_request;
+  rcl_interfaces__srv__GetParameters_Response get_parameters_response;
+
+  rcl_interfaces__srv__SetParameters_Request set_parameters_request;
+  rcl_interfaces__srv__SetParameters_Response set_parameters_response;
+
+  rcl_interfaces__srv__SetParametersAtomically_Request set_parameters_atomically_request;
+  rcl_interfaces__srv__SetParametersAtomically_Response set_parameters_atomically_response;
+
+  rcl_interfaces__srv__ListParameters_Request list_parameters_request;
+  rcl_interfaces__srv__ListParameters_Response list_parameters_response;
+
+  // Storage for an optional parameter event subscriber (??)
   rcl_subscription_t * parameter_event_subscription;
 } rcl_parameter_client_impl_t;
+
+// TODO Macros and definitions
+rcl_ret_t
+rcl_parameter_client_set_bool(
+  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, bool value, size_t i)
+{
+  rosidl_generator_c__String__assign(&parameter->name, parameter_name);
+  parameter->value.type = rcl_interfaces__msg__ParameterType__PARAMETER_BOOL;
+  parameter->value.bool_value = value;
+  return RCL_RET_OK;
+}
 
 
 #if __cplusplus
 }
 #endif
-
-#endif  // RCL__PARAMETER_CLIENT_H_

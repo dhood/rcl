@@ -28,10 +28,12 @@ extern "C"
 
 // node_name + __get_parameters
 // TODO macros instead?
+/*
 RCL_PUBLIC
 RCL_WARN_UNUSED
 const char *
 rcl_get_parameters_service_name(rcl_node_t * node);
+*/
 
 
 #if __cplusplus

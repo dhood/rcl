@@ -20,9 +20,9 @@ extern "C"
 #include <rcl_interfaces/srv/get_parameters.h>
 #include <rcl_interfaces/srv/list_parameters.h>
 #include <rcl_interfaces/srv/set_parameters.h>
+#include <rcl_interfaces/srv/set_parameters_atomically.h>
 
-#include "rcl/node.h"
-#include "rcl/service.h"
+#include "rcl/parameter_service.h"
 
 typedef struct rcl_parameter_service_impl_t
 {
