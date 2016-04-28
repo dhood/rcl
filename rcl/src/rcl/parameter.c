@@ -23,19 +23,20 @@ extern "C"
 
 #include "rcl/types.h"
 
-// These macros could take us far in life
-#define RCL_DEFINE_SET_PARAMETER(TYPE) \
+#define RCL_DEFINE_SET_PARAMETER(TYPE, CTYPE, ENUM_TYPE) \
 rcl_ret_t \
-rcl_parameter_set_ ## TYPE ## ( \
-  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, CTYPE(TYPE) value) \
+rcl_parameter_set_ ## TYPE ( \
+  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, CTYPE value) \
 { \
   rosidl_generator_c__String__assign(&parameter->name, parameter_name); \
-  parameter->value.type = RCL_ENUM_TYPE(TYPE); \
-  parameter->value. ## TYPE ## _value = value; \
+  parameter->value.type = rcl_interfaces__msg__ParameterType__ ## ENUM_TYPE; \
+  parameter->value. TYPE ## _value = value; \
   return RCL_RET_OK; \
 }
 
+RCL_DEFINE_SET_PARAMETER(bool, bool, PARAMETER_BOOL)
 
+/*
 rcl_ret_t
 rcl_parameter_set_bool(
   rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, bool value)
@@ -46,6 +47,7 @@ rcl_parameter_set_bool(
   return RCL_RET_OK;
 }
 
+*/
 
 
 #if __cplusplus

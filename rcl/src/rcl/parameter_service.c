@@ -94,17 +94,17 @@ rcl_parameter_service_fini(rcl_parameter_service_t * parameter_service)
 // TODO We potentially need an array copy to make this work for some fields
 #define DEFINE_RCL_PARAMETER_SERVICE_TAKE_REQUEST(VERB, REQUEST_SUBTYPE, SUBFIELD_NAME) \
 rcl_ret_t \
-rcl_parameter_service_send_ ## VERB ## _request( \
+rcl_parameter_service_take_ ## VERB ## _request( \
   const rcl_parameter_service_t * parameter_service, \
   rmw_request_id_t * request_header, \
-  const REQUEST_SUBTYPE * SUBFIELD_NAME) \
+  REQUEST_SUBTYPE * SUBFIELD_NAME) \
 { \
   RCL_CHECK_ARGUMENT_FOR_NULL(parameter_service, RCL_RET_INVALID_ARGUMENT); \
   RCL_CHECK_ARGUMENT_FOR_NULL(SUBFIELD_NAME, RCL_RET_INVALID_ARGUMENT); \
  \
   parameter_service->impl->VERB ## _request.SUBFIELD_NAME = *SUBFIELD_NAME; \
  \
-  rcl_ret_t ret = rcl_take_reqest( \
+  rcl_ret_t ret = rcl_take_request( \
     parameter_service->impl->VERB ## _service, request_header, &parameter_service->impl->VERB ## _request); \
  \
   return ret; \
@@ -118,10 +118,10 @@ DEFINE_RCL_PARAMETER_SERVICE_TAKE_REQUEST(set_atomically, rcl_interfaces__msg__P
 
 #define DEFINE_RCL_PARAMETER_SERVICE_SEND_RESPONSE(VERB, REQUEST_SUBTYPE, SUBFIELD_NAME) \
 rcl_ret_t \
-rcl_parameter_service_take_ ## VERB ## _response( \
+rcl_parameter_service_send_ ## VERB ## _response( \
   const rcl_parameter_service_t * parameter_service, \
   rmw_request_id_t * request_header,\
-  REQUEST_SUBTYPE * SUBFIELD_NAME) \
+  const REQUEST_SUBTYPE * SUBFIELD_NAME) \
 { \
   RCL_CHECK_ARGUMENT_FOR_NULL(parameter_service, RCL_RET_INVALID_ARGUMENT); \
   RCL_CHECK_ARGUMENT_FOR_NULL(SUBFIELD_NAME, RCL_RET_INVALID_ARGUMENT); \

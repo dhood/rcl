@@ -96,7 +96,7 @@ rcl_ret_t
 rcl_parameter_service_send_get_response(
   const rcl_parameter_service_t * service,
   rmw_request_id_t * request_header,
-  rcl_interfaces__msg__ParameterValue__Array * parameters);
+  const rcl_interfaces__msg__ParameterValue__Array * parameters);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
@@ -104,7 +104,7 @@ rcl_ret_t
 rcl_parameter_service_send_get_types_response(
   const rcl_parameter_service_t * service,
   rmw_request_id_t * request_header,
-  rosidl_generator_c__uint8__Array * parameter_types);
+  const rosidl_generator_c__uint8__Array * parameter_types);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
@@ -112,7 +112,7 @@ rcl_ret_t
 rcl_parameter_service_take_get_types_request(
   const rcl_parameter_service_t * service,
   rmw_request_id_t * request_header,
-  const rosidl_generator_c__String__Array * parameter_names);
+  rosidl_generator_c__String__Array * parameter_names);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
