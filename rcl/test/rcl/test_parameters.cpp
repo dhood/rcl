@@ -157,7 +157,7 @@ bool fill_parameter_names_array(rosidl_generator_c__String__Array * names)
 TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters)
 {
   stop_memory_checking();
-
+  rmw_request_id_t request_header;
   rcl_ret_t ret;
   (void) ret;
 
@@ -180,7 +180,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters
   // wait until the parameters were set, may have to set up waiting/taking for parameter services
   ret = rcl_wait(this->wait_set, -1);
   rcl_interfaces__msg__Parameter__Array * parameters_req = nullptr;
-  ret = rcl_parameter_service_take_set_request(this->parameter_service, parameters_req);
+  ret = rcl_parameter_service_take_set_request(this->parameter_service, &request_header, parameters_req);
   // In a real client library, need to access the request, fill in the response based on
   // node's storage, debugging tools that set the reason, etc.
   // TODO validate that parameters_req matches parameters
@@ -191,12 +191,12 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters
     results.data[i].successful = true;
     rosidl_generator_c__String__assign(&results.data[i].reason, "Because reasons");
   }
-  ret = rcl_parameter_service_send_set_response(this->parameter_service, &results);
+  ret = rcl_parameter_service_send_set_response(this->parameter_service, &request_header, &results);
 
   ret = rcl_wait_set_add_parameter_client(this->wait_set, this->parameter_client);
   ret = rcl_wait(this->wait_set, -1);
   rcl_interfaces__msg__SetParametersResult__Array * results_response = nullptr;
-  ret = rcl_parameter_client_take_set_response(this->parameter_client, results_response);
+  ret = rcl_parameter_client_take_set_response(this->parameter_client, &request_header, results_response);
   // TODO validate results and results_response
 }
 
@@ -204,6 +204,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters
 {
   stop_memory_checking();
 
+  rmw_request_id_t request_header;
   rcl_ret_t ret;
   (void) ret;
 
@@ -226,7 +227,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters
   // wait until the parameters were set, may have to set up waiting/taking for parameter services
   ret = rcl_wait(this->wait_set, -1);
   rcl_interfaces__msg__Parameter__Array * parameters_req = nullptr;
-  ret = rcl_parameter_service_take_set_atomically_request(this->parameter_service, parameters_req);
+  ret = rcl_parameter_service_take_set_atomically_request(this->parameter_service, &request_header, parameters_req);
   // In a real client library, need to access the request, fill in the response based on
   // node's storage, debugging tools that set the reason, etc.
   // TODO validate that parameters_req matches parameters
@@ -235,12 +236,12 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters
   // Should SetParametersResult have a "name" field for the parameter key it describes?
   result.successful = true;
   rosidl_generator_c__String__assign(&result.reason, "Because reasons");
-  ret = rcl_parameter_service_send_set_atomically_response(this->parameter_service, &result);
+  ret = rcl_parameter_service_send_set_atomically_response(this->parameter_service, &request_header, &result);
 
   ret = rcl_wait_set_add_parameter_service(this->wait_set, this->parameter_service);
   ret = rcl_wait(this->wait_set, -1);
   rcl_interfaces__msg__SetParametersResult * result_response = nullptr;
-  ret = rcl_parameter_client_take_set_atomically_response(this->parameter_client, result_response);
+  ret = rcl_parameter_client_take_set_atomically_response(this->parameter_client, &request_header, result_response);
   // TODO validate results and results_response
 }
 
@@ -248,6 +249,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_set_parameters
 TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameters)
 {
   stop_memory_checking();
+  rmw_request_id_t request_header;
   rcl_ret_t ret;
   (void) ret;
 
@@ -265,13 +267,13 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameters
   ret = rcl_wait(this->wait_set, -1);
 
   rosidl_generator_c__String__Array * request = nullptr;
-  ret = rcl_parameter_service_take_get_request(this->parameter_service, request);
+  ret = rcl_parameter_service_take_get_request(this->parameter_service, &request_header, request);
   // TODO Validate the request
 
   // Assign some bogus values
   // In a real client library, these would be pulled from the language-specific storage
   ret = fill_parameter_array(&parameter_values);
-  ret = rcl_parameter_service_send_get_response(this->parameter_service, &parameter_values);
+  ret = rcl_parameter_service_send_get_response(this->parameter_service, &request_header, &parameter_values);
 
   ret = rcl_wait_set_add_parameter_client(this->wait_set, this->parameter_client);
   rcl_wait(this->wait_set, -1);
@@ -279,7 +281,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameters
   // TODO: Should GetParameters_Response have a Parameter__Array subfield
   // instead of a ParameterValue__Array?
   rcl_interfaces__msg__ParameterValue__Array * response = nullptr;
-  ret = rcl_parameter_client_take_get_response(this->parameter_client, response);
+  ret = rcl_parameter_client_take_get_response(this->parameter_client, &request_header, response);
 
   // TODO Validate the response values
 }
@@ -288,6 +290,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameters
 TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameter_types)
 {
   stop_memory_checking();
+  rmw_request_id_t request_header;
   rcl_ret_t ret;
   (void) ret;
 
@@ -306,7 +309,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameter_
   ret = rcl_wait(this->wait_set, -1);
 
   rosidl_generator_c__String__Array * request = nullptr;
-  ret = rcl_parameter_service_take_get_types_request(this->parameter_service, request);
+  ret = rcl_parameter_service_take_get_types_request(this->parameter_service, &request_header, request);
   // TODO Validate request
 
   size_t parameters_idx = 0;
@@ -315,12 +318,12 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameter_
   parameter_types.data[parameters_idx++] = rcl_interfaces__msg__ParameterType__PARAMETER_DOUBLE;
   parameter_types.data[parameters_idx++] = rcl_interfaces__msg__ParameterType__PARAMETER_STRING;
   parameter_types.data[parameters_idx++] = rcl_interfaces__msg__ParameterType__PARAMETER_BYTES;
-  ret = rcl_parameter_service_send_get_types_response(this->parameter_service, &parameter_types);
+  ret = rcl_parameter_service_send_get_types_response(this->parameter_service, &request_header, &parameter_types);
 
   ret = rcl_wait_set_add_parameter_client(this->wait_set, this->parameter_client);
   ret = rcl_wait(this->wait_set, -1);
   rosidl_generator_c__uint8__Array * response;
-  ret = rcl_parameter_client_take_get_types_response(this->parameter_client, response);
+  ret = rcl_parameter_client_take_get_types_response(this->parameter_client, &request_header, response);
 
   // TODO Validate everything
 }
@@ -328,6 +331,7 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_get_parameter_
 TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_list_parameters)
 {
   stop_memory_checking();
+  rmw_request_id_t request_header;
   rcl_ret_t ret;
   (void) ret;
 
@@ -347,11 +351,11 @@ TEST_F(CLASSNAME(TestParametersFixture, RMW_IMPLEMENTATION), test_list_parameter
 
   rosidl_generator_c__String__Array * prefixes_req;
   uint64_t depth_req;
-  ret = rcl_parameter_service_take_list_request(this->parameter_service, prefixes_req, &depth_req);
+  ret = rcl_parameter_service_take_list_request(this->parameter_service, &request_header, prefixes_req, &depth_req);
 
   // put some names in 
   fill_parameter_names_array(&list_result.names);
-  ret = rcl_parameter_service_send_list_response(this->parameter_service, &list_result);
+  ret = rcl_parameter_service_send_list_response(this->parameter_service, &request_header, &list_result);
 
   ret = rcl_wait_set_add_parameter_client(this->wait_set, this->parameter_client);
   ret = rcl_wait(this->wait_set, -1);

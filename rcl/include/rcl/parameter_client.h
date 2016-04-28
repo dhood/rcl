@@ -90,13 +90,14 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_send_set_request(
   const rcl_parameter_client_t * parameter_client,
-  rcl_interfaces__msg__Parameter__Array * parameters);
+  const rcl_interfaces__msg__Parameter__Array * parameters);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_take_set_response(
   const rcl_parameter_client_t * parameter_client,
+  rmw_request_id_t * request_header,
   rcl_interfaces__msg__SetParametersResult__Array * set_parameters_result);
 
 RCL_PUBLIC
@@ -104,13 +105,14 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_send_get_request(
   const rcl_parameter_client_t * client,
-  const rosidl_generator_c__String__Array * parameter_names);
+  const rosidl_generator_c__String__Array * names);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_take_get_response(
   const rcl_parameter_client_t * client,
+  rmw_request_id_t * request_header,
   rcl_interfaces__msg__ParameterValue__Array * parameter_values);
 
 RCL_PUBLIC
@@ -125,6 +127,7 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_take_get_types_response(
   const rcl_parameter_client_t * client,
+  rmw_request_id_t * request_header,
   rosidl_generator_c__uint8__Array * parameter_types);
 
 RCL_PUBLIC
@@ -139,6 +142,7 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_take_set_atomically_response(
   const rcl_parameter_client_t * client,
+  rmw_request_id_t * request_header,
   rcl_interfaces__msg__SetParametersResult * set_parameters_result);
 
 RCL_PUBLIC
@@ -146,7 +150,7 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_send_list_request(
   const rcl_parameter_client_t * client,
-  rosidl_generator_c__String__Array * prefixes,
+  const rosidl_generator_c__String__Array * prefixes,
   uint64_t depth);
 
 RCL_PUBLIC
@@ -154,6 +158,7 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_take_list_response(
   const rcl_parameter_client_t * client,
+  rmw_request_id_t * request_header,
   rcl_interfaces__msg__ListParametersResult * set_parameters_result);
 
 /*
