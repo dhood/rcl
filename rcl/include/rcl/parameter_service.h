@@ -20,6 +20,7 @@ extern "C"
 {
 #endif
 
+#include <rcl_interfaces/msg/list_parameters_result__struct.h>
 #include <rcl_interfaces/msg/parameter__struct.h>
 #include <rcl_interfaces/msg/set_parameters_result__struct.h>
 
@@ -79,6 +80,63 @@ rcl_parameter_service_send_set_response(
   const rcl_parameter_service_t * service,
   const rcl_interfaces__msg__SetParametersResult__Array * set_parameter_results);
 
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_take_get_request(
+  const rcl_parameter_service_t * service,
+  rosidl_generator_c__String__Array * parameter_names);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_send_get_response(
+  const rcl_parameter_service_t * service,
+  rcl_interfaces__msg__ParameterValue__Array * parameters);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_send_get_types_response(
+  const rcl_parameter_service_t * service,
+  rosidl_generator_c__uint8__Array * parameter_types);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_take_get_types_request(
+  const rcl_parameter_service_t * service,
+  const rosidl_generator_c__String__Array * parameter_names);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_take_set_atomically_request(
+  const rcl_parameter_service_t * service,
+  rcl_interfaces__msg__Parameter__Array * parameter_values);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_send_set_atomically_response(
+  const rcl_parameter_service_t * service,
+  const rcl_interfaces__msg__SetParametersResult * set_parameters_result);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_take_list_request(
+  const rcl_parameter_service_t * service,
+  rosidl_generator_c__String__Array * prefixes,
+  uint64_t * depth);
+
+RCL_PUBLIC
+RCL_WARN_UNUSED
+rcl_ret_t
+rcl_parameter_service_send_list_response(
+  const rcl_parameter_service_t * service,
+  const rcl_interfaces__msg__ListParametersResult * set_parameters_result);
+
 /*
 message/request/response conversion functions:
 
@@ -93,68 +151,6 @@ rcl_events_from_set_parameters_atomically_response
 rcl_events_from_list_parameters_atomically_response
 */
 
-/*
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_take_get_parameters_request(
-  const rcl_parameter_service_t * service,
-  rosidl_generator_c__String__Array * parameter_names);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_take_get_parameter_types_request(
-  const rcl_parameter_service_t * service,
-  rosidl_generator_c__String__Array * parameter_names);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_send_get_parameter_types_response(
-  const rcl_parameter_service_t * service,
-  const rosidl_generator_c__uint8__Array * parameter_types);
-
-// Function arguments pass messages defined in rcl_interfaces directly
-// Wraps rcl_interfaces/Parameter array into Request
-// wrap service send_request call
-
-// take response of set_parameters call
-// converts srv to results structure
-RCL_PUBLIC RCL_WARN_UNUSED rcl_ret_t
-rcl_send_set_parameters_response(
-  const rcl_parameter_service_t * service,
-  const rcl_interfaces__msg__SetParametersResult * set_parameters_result);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_take_set_parameters_atomically_request(
-  const rcl_parameter_service_t * service,
-  rcl_interfaces__msg__Parameter__Array * parameter_values);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_send_set_parameters_atomically_response(
-  const rcl_parameter_service_t * service,
-  const rcl_interfaces__msg__SetParametersResult * set_parameters_result);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_take_list_parameters_request(
-  const rcl_parameter_service_t * service,
-  rosidl_generator_c__String__Array * prefixes,
-  uint64_t * depth);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_send_list_parameters_response(
-  const rcl_parameter_service_t * service,
-  const rcl_interfaces__msg__ListParametersResult * set_parameters_result);
-*/
 
 #if __cplusplus
 }

@@ -20,6 +20,7 @@ extern "C"
 {
 #endif
 
+#include <rcl_interfaces/msg/list_parameters_result__struct.h>
 #include <rcl_interfaces/msg/parameter__struct.h>
 #include <rcl_interfaces/msg/set_parameters_result__struct.h>
 
@@ -34,6 +35,8 @@ extern "C"
 - utilities for populating parameter_event?
 
 - parameter_event msg can get populated with the response of a parameter_service
+
+- TODO for the long future: caching in client and service
 */
 
 /// Internal rcl implementation struct
@@ -82,152 +85,66 @@ RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_fini(rcl_parameter_client_t * parameter_client);
 
-/// rcl_parameter_client_set_<TYPE> adds the parameter key, value pair to the
-/// pending set_parameters_request
-// CTYPE is a macro to sanitize human-readble type names to valid c types
-#define RCL_DEFINE_SET_PARAMETER_REQUEST(TYPE) \
-RCL_PUBLIC \
-RCL_WARN_UNUSED \
-rcl_ret_t \
-rcl_parameter_set_ ## TYPE ## ( \
-  rcl_interfaces__msg__Parameter * parameter, const char * name, CTYPE(TYPE) value, size_t * i); \
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_parameter_set_bool(
-  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, bool value);
-
-// Or, with the above macro, it would simply be RCL_DEFINE_SET_PARAMETER_REQUEST(bool)
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_parameter_set_int(
-  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, int value);
-
-// can't distinguish between floats and doubles. should use doubles underneath for more precision.
-// But should we still call them floats?
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_parameter_set_float(
-  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, double value);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_parameter_set_string(
-  rcl_interfaces__msg__Parameter * parameter,
-  const char * parameter_name,
-  const char * value);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_parameter_set_bytes(
-  rcl_interfaces__msg__Parameter * parameter,
-  const char * parameter_name,
-  const char * value);
-
-// etc. for all types
-
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
 rcl_parameter_client_send_set_request(
-  rcl_parameter_client_t * parameter_client, rcl_interfaces__msg__Parameter__Array * parameters);
+  const rcl_parameter_client_t * parameter_client,
+  rcl_interfaces__msg__Parameter__Array * parameters);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_parameter_client_take_set_response(rcl_parameter_client_t * parameter_client,
+rcl_parameter_client_take_set_response(
+  const rcl_parameter_client_t * parameter_client,
   rcl_interfaces__msg__SetParametersResult__Array * set_parameters_result);
 
-
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_parameter_client_get_parameter(rcl_parameter_client_t * parameter_client, const char * parameter_name);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_parameter_client_get_parameters(rcl_parameter_client_t * parameter_client, const char ** parameter_names);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_parameter_client_take_get_response(rcl_parameter_client_t * parameter_client,
-  rcl_interfaces__msg__ParameterValue__Array * set_parameters_result);
-
-
-// I'm really not sure how useful any of the following stuff is
-
-/*
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_send_get_parameters_request(
+rcl_parameter_client_send_get_request(
   const rcl_parameter_client_t * client,
   const rosidl_generator_c__String__Array * parameter_names);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_take_get_parameters_response(
+rcl_parameter_client_take_get_response(
   const rcl_parameter_client_t * client,
   rcl_interfaces__msg__ParameterValue__Array * parameter_values);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_send_get_parameter_types_request(
+rcl_parameter_client_send_get_types_request(
   const rcl_parameter_client_t * client,
   const rosidl_generator_c__String__Array * parameter_names);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_take_get_parameter_types_response(
+rcl_parameter_client_take_get_types_response(
   const rcl_parameter_client_t * client,
   rosidl_generator_c__uint8__Array * parameter_types);
 
-// Function arguments pass messages defined in rcl_interfaces directly
-// Wraps rcl_interfaces/Parameter array into Request
-// wrap client send_request call
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_send_set_parameters_request(
-  const rcl_parameter_client_t * client,
-  const rcl_interfaces__msg__Parameter__Array * parameter_values);
-
-// take response of set_parameters call
-// converts srv to results structure
-RCL_PUBLIC RCL_WARN_UNUSED rcl_ret_t
-rcl_take_set_parameters_response(
-  const rcl_parameter_client_t * client,
-  rcl_interfaces__msg__SetParametersResult * set_parameters_result);
-
-RCL_PUBLIC
-RCL_WARN_UNUSED
-rcl_ret_t
-rcl_send_set_parameters_atomically_request(
+rcl_parameter_client_send_set_atomically_request(
   const rcl_parameter_client_t * client,
   const rcl_interfaces__msg__Parameter__Array * parameter_values);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_take_set_parameters_atomically_response(
+rcl_parameter_client_take_set_atomically_response(
   const rcl_parameter_client_t * client,
   rcl_interfaces__msg__SetParametersResult * set_parameters_result);
 
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_send_list_parameters_request(
+rcl_parameter_client_send_list_request(
   const rcl_parameter_client_t * client,
   rosidl_generator_c__String__Array * prefixes,
   uint64_t depth);
@@ -235,9 +152,11 @@ rcl_send_list_parameters_request(
 RCL_PUBLIC
 RCL_WARN_UNUSED
 rcl_ret_t
-rcl_take_list_parameters_response(
+rcl_parameter_client_take_list_response(
   const rcl_parameter_client_t * client,
   rcl_interfaces__msg__ListParametersResult * set_parameters_result);
+
+/*
 
 RCL_PUBLIC
 RCL_WARN_UNUSED

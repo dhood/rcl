@@ -54,17 +54,6 @@ typedef struct rcl_parameter_client_impl_t
   rcl_subscription_t * parameter_event_subscription;
 } rcl_parameter_client_impl_t;
 
-// TODO Macros and definitions
-rcl_ret_t
-rcl_parameter_client_set_bool(
-  rcl_interfaces__msg__Parameter * parameter, const char * parameter_name, bool value, size_t i)
-{
-  rosidl_generator_c__String__assign(&parameter->name, parameter_name);
-  parameter->value.type = rcl_interfaces__msg__ParameterType__PARAMETER_BOOL;
-  parameter->value.bool_value = value;
-  return RCL_RET_OK;
-}
-
 
 #if __cplusplus
 }
